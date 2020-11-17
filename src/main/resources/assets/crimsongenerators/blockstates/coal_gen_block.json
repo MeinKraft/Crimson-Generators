@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "crimsongenerators:block/coal_gen_block"
+    }
+  }
+}

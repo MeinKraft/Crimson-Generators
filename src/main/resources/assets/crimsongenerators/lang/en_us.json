@@ -1,0 +1,15 @@
+{
+  "itemGroup.myfirsttab":  "My First Tab",
+  "tip.myfirstmod.hold_shift": "\u00A77Hold\u00A7e Shift\u00A77 for more information!",
+
+  "item.myfirstmod.ruby": "A Ruby Item",
+  "item.myfirstmod.ruby.tip1": "Real Information",
+  "item.myfirstmod.ruby.tip2": "is not found anywhere",
+  "item.myfirstmod.ruby.tip3": "there is no more information",
+
+  "effect.myfirstmod.example_effect": "My Potion",
+  "item.minecraft.potion.effect.example_effect": "My Potion",
+  "item.minecraft.splash_potion.effect.example_effect": "My Potion Splash",
+  "item.minecraft.lingering_potion.effect.example_effect": "My Potion Lingering",
+  "item.minecraft.tipped_arrow.effect.example_effect": "My Potion Arrow"
+}
