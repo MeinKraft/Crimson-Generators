@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "crimsongenerators:block/lava_gen_block"
+    }
+  }
+}

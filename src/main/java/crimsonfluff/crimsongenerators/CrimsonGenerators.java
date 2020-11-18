@@ -26,7 +26,7 @@ public class CrimsonGenerators {
         MOD_EVENTBUS.addListener(this::setup);
         MOD_EVENTBUS.addListener(this::doClientStuff);
 
-        tilesInit.TILE_ENTITY_TYPES.register(MOD_EVENTBUS);
+        tilesInit.TILES.register(MOD_EVENTBUS);
         blocksInit.BLOCKS.register(MOD_EVENTBUS);
         itemsInit.ITEMS.register(MOD_EVENTBUS);
 

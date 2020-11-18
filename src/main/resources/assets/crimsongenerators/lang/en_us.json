@@ -1,15 +1,12 @@
 {
-  "itemGroup.myfirsttab":  "My First Tab",
-  "tip.myfirstmod.hold_shift": "\u00A77Hold\u00A7e Shift\u00A77 for more information!",
+  "itemGroup.crimsongenerators":  "Crimson Generators",
+  "tip.crimsongenerators.hold_shift": "\u00A77Hold\u00A7e Shift\u00A77 for more information!",
 
-  "item.myfirstmod.ruby": "A Ruby Item",
-  "item.myfirstmod.ruby.tip1": "Real Information",
-  "item.myfirstmod.ruby.tip2": "is not found anywhere",
-  "item.myfirstmod.ruby.tip3": "there is no more information",
+  "block.crimsongenerators.coal_gen_block": "Coal Ore Generator",
+  "block.crimsongenerators.lava_gen_block": "Lava Generator",
+  "block.crimsongenerators.water_gen_block": "Water Generator",
 
-  "effect.myfirstmod.example_effect": "My Potion",
-  "item.minecraft.potion.effect.example_effect": "My Potion",
-  "item.minecraft.splash_potion.effect.example_effect": "My Potion Splash",
-  "item.minecraft.lingering_potion.effect.example_effect": "My Potion Lingering",
-  "item.minecraft.tipped_arrow.effect.example_effect": "My Potion Arrow"
+  "tip.crimsongenerators.coal_gen_block": "Passively does things",
+  "tip.crimsongenerators.lava_gen_block": "Passively does things",
+  "tip.crimsongenerators.water_gen_block": "Passively does things"
 }
