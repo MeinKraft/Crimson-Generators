@@ -7,13 +7,19 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.audio.Sound;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.state.IntegerProperty;
+import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
@@ -29,6 +35,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import javax.annotation.Nullable;
 import java.util.List;
 
+@SuppressWarnings("deprecation")
 public class BlockCoalGen extends Block {
     public BlockCoalGen() {
         super(Properties.create(Material.ROCK)
@@ -37,6 +44,13 @@ public class BlockCoalGen extends Block {
                 .harvestLevel(0)
                 .harvestTool(ToolType.PICKAXE)
                 .setRequiresTool());
+        this.setDefaultState(this.stateContainer.getBaseState().with(CrimsonGenerators.TIER, 0));
+    }
+
+    @Override
+    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+        super.fillStateContainer(builder);
+        builder.add(CrimsonGenerators.TIER);
     }
 
     @Override
@@ -50,7 +64,7 @@ public class BlockCoalGen extends Block {
     public void onReplaced(BlockState oldState, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
         if (oldState.getBlock() != newState.getBlock()) {
             // if Multiple Slots then...
-            /*             worldIn.getTileEntity(pos).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(h -> {
+            /*  worldIn.getTileEntity(pos).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(h -> {
                 for (int i = 0; i < h.getSlots(); i++) {
                     spawnAsEntity(worldIn, pos, h.getStackInSlot(i));
                 }
@@ -58,6 +72,8 @@ public class BlockCoalGen extends Block {
 
             worldIn.getTileEntity(pos).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(h -> {
                     spawnAsEntity(worldIn, pos, h.getStackInSlot(0)); });
+
+            worldIn.removeTileEntity(pos);
         }
         super.onReplaced(oldState, worldIn, pos, newState, isMoving);
     }
@@ -93,5 +109,15 @@ public class BlockCoalGen extends Block {
         }
 
         return ActionResultType.SUCCESS;
+    }
+
+    @Override
+    public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+        super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
+
+        if (stack.hasDisplayName()) {
+            TileEntity tile = worldIn.getTileEntity(pos);
+            ((TileCoalGen) tile).setCustomName(stack.getDisplayName());
+        }
     }
 }

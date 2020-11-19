@@ -1,5 +1,6 @@
 package crimsonfluff.crimsongenerators.tiles;
 
+import crimsonfluff.crimsongenerators.CrimsonGenerators;
 import crimsonfluff.crimsongenerators.init.tilesInit;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -8,7 +9,10 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -21,6 +25,7 @@ import javax.annotation.Nullable;
 public class TileCoalGen extends TileEntity implements ITickableTileEntity {
     private ItemStackHandler handler;
     private int ticks = 0;
+    private ITextComponent customName;
 
     public TileCoalGen() { super(tilesInit.COAL_GEN_TILE.get()); }
 
@@ -74,6 +79,9 @@ public class TileCoalGen extends TileEntity implements ITickableTileEntity {
     public CompoundNBT write(CompoundNBT tag) {
         CompoundNBT compound = getItemHandler().serializeNBT();
         tag.put("inv", compound);
+        if (this.customName!=null) {
+            tag.putString("CustomName", ITextComponent.Serializer.toJson(this.customName));
+        }
         return super.write(tag);
     }
 
@@ -83,5 +91,30 @@ public class TileCoalGen extends TileEntity implements ITickableTileEntity {
         if (tag.contains("inv")) {
             getItemHandler().deserializeNBT((CompoundNBT) tag.get("inv"));
         }
+        if (tag.contains("CustomName", Constants.NBT.TAG_STRING)) {
+            this.customName = ITextComponent.Serializer.getComponentFromJson(tag.getString("CustomName"));
+        }
+    }
+
+    public void setCustomName(ITextComponent name) {
+        this.customName = name;
+    }
+
+    public ITextComponent getName() {
+        return this.customName !=null ? this.customName : this.getDefaultName();
+    }
+
+    private ITextComponent getDefaultName() {
+        return new TranslationTextComponent("item."+CrimsonGenerators.MOD_ID+".coal_gen_block");
+    }
+
+/*    @Override
+    public ITextComponent getDisplayName() {
+        return this.getName();
+    }*/
+
+    @Nullable
+    public ITextComponent getCustomName() {
+        return this.customName;
     }
 }
