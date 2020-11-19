@@ -4,6 +4,7 @@ import crimsonfluff.crimsongenerators.init.itemsInit;
 import crimsonfluff.crimsongenerators.init.blocksInit;
 import crimsonfluff.crimsongenerators.init.tilesInit;
 
+import crimsonfluff.crimsongenerators.items.ItemCoalGen;
 import crimsonfluff.crimsongenerators.items.ItemUpgradeTier1;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -61,24 +62,26 @@ public class CrimsonGenerators {
         BlockState state = world.getBlockState(event.getPos());
         Block block = state.getBlock();
 
-        int sizeIncrease=0;
+        boolean success=false;
 
         if (!world.isRemote) {
-            if (block.getBlock() == blocksInit.COAL_GEN_BLOCK.get()) {
+            if (block.getBlock() == blocksInit.COAL_GEN_BLOCK.get() ||
+                    block.getBlock() == blocksInit.LAVA_GEN_BLOCK.get() ||
+                    block.getBlock() == blocksInit.WATER_GEN_BLOCK.get()) {
+
                 if (entity.inventory.getCurrentItem().getItem() == itemsInit.UPGRADE_TIER1.get()) {
-                    if (state.get(TIER)==0) { sizeIncrease = 10; }
+                    if (state.get(TIER)==0) success = true;
                 }
 
                 if (entity.inventory.getCurrentItem().getItem() == itemsInit.UPGRADE_TIER2.get()) {
-                    if (state.get(TIER)==1) { sizeIncrease = 20; }
+                    if (state.get(TIER)==1) success = true;
                 }
 
                 if (entity.inventory.getCurrentItem().getItem() == itemsInit.UPGRADE_TIER3.get()) {
-                    if (state.get(TIER)==2) { sizeIncrease = 30; }
+                    if (state.get(TIER)==2) success = true;
                 }
 
-                if (sizeIncrease !=0) {
-                    LOGGER.info("APPLYING UPGRADE");
+                if (success) {
                     world.playSound(null, event.getPos(), SoundEvents.BLOCK_ANVIL_USE, SoundCategory.PLAYERS, 1f, 1f);
                     world.setBlockState(event.getPos(), state.with(TIER, state.get(TIER) + 1));
                 }

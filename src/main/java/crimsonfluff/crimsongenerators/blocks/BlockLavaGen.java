@@ -1,6 +1,7 @@
 package crimsonfluff.crimsongenerators.blocks;
 
 import crimsonfluff.crimsongenerators.CrimsonGenerators;
+import crimsonfluff.crimsongenerators.init.itemsInit;
 import crimsonfluff.crimsongenerators.tiles.TileLavaGen;
 import crimsonfluff.crimsongenerators.util.KeyboardHelper;
 import net.minecraft.block.Block;
@@ -11,6 +12,9 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.potion.PotionUtils;
+import net.minecraft.potion.Potions;
+import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
@@ -29,6 +33,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -42,6 +47,13 @@ public class BlockLavaGen extends Block {
                 .harvestTool(ToolType.PICKAXE)
                 .setLightLevel(IntToFunction -> 13)
                 .setRequiresTool());
+        this.setDefaultState(this.stateContainer.getBaseState().with(CrimsonGenerators.TIER, 0));
+    }
+
+    @Override
+    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+        super.fillStateContainer(builder);
+        builder.add(CrimsonGenerators.TIER);
     }
 
     @Override
@@ -50,6 +62,12 @@ public class BlockLavaGen extends Block {
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) { return new TileLavaGen(); }
+
+    @Override
+    public void onReplaced(BlockState oldState, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (oldState.getBlock() != newState.getBlock()) worldIn.removeTileEntity(pos);
+        super.onReplaced(oldState, worldIn, pos, newState, isMoving);
+    }
 
     @Override
     public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult) {
@@ -78,8 +96,19 @@ public class BlockLavaGen extends Block {
                                 heldItem.shrink(1);
                             }
                         }
-                    }
+                    } else {
+                        if (heldItem.getItem() == Items.GLASS_BOTTLE) {
+                            FluidStack simulated = fluidHandler.drain(333, IFluidHandler.FluidAction.SIMULATE);
 
+                            if (simulated.getAmount() == 333) {
+                                fluidHandler.drain(333, IFluidHandler.FluidAction.EXECUTE);
+
+                                if (player.addItemStackToInventory(new ItemStack(itemsInit.LAVA_BOTTLE.get()))) {
+                                    heldItem.shrink(1);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

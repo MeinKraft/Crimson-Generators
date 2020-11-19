@@ -31,29 +31,50 @@ public class TileCoalGen extends TileEntity implements ITickableTileEntity {
 
     @Override
     public void tick() {
-        ticks++;
-        if (ticks == 20) {
-            ticks = 0;
+        if (!world.isRemote) {
 
-            ItemStack stack = new ItemStack(Blocks.COAL_ORE, 1);
-            ItemHandlerHelper.insertItemStacked(getItemHandler(), stack, false);
+            ticks++;
+            if (ticks == 20) {
+                ticks = 0;
 
-            TileEntity tile = world.getTileEntity(pos.offset(Direction.UP));
-            if (tile != null && tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Direction.DOWN).isPresent()) {
-                IItemHandler ihandler = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Direction.DOWN).orElse(null);
+                BlockState state = this.getBlockState();
+                int AMP = 0;
 
-            // handler is my tile entity, and is never empty
-                //if (handler.getStackInSlot(0) != ItemStack.EMPTY) {
+            // Needs 'break;' else it kept defaulting to last statement (AMP 64)
+            // weird
+                switch(state.get(CrimsonGenerators.TIER)) {
+                    case 0:
+                        AMP = 1;
+                        break;
+                    case 1:
+                        AMP = 10;
+                        break;
+                    case 2:
+                        AMP = 32;
+                        break;
+                    case 3:
+                        AMP = 64;
+                }
 
-                    ItemStack stack2 = handler.getStackInSlot(0).copy();
-                    stack2.setCount(1);
-                    ItemStack stack1 = ItemHandlerHelper.insertItem(ihandler, stack2, true);
+                ItemStack stack = new ItemStack(Blocks.COAL_ORE, AMP);
+                ItemHandlerHelper.insertItemStacked(getItemHandler(), stack, false);
 
-                    if (stack1 == ItemStack.EMPTY || stack1.getCount() == 0) {
-                        ItemHandlerHelper.insertItem(ihandler, handler.extractItem(0, 1, false), false);
-                        markDirty();
+                TileEntity tile = world.getTileEntity(pos.offset(Direction.UP));
+                if (tile != null && tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Direction.DOWN).isPresent()) {
+                    IItemHandler ihandler = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Direction.DOWN).orElse(null);
+
+                    // handler is my tile entity
+                    if (handler.getStackInSlot(0) != ItemStack.EMPTY) {
+                        ItemStack stack2 = handler.getStackInSlot(0).copy();
+                        stack2.setCount(AMP);
+                        ItemStack stack1 = ItemHandlerHelper.insertItem(ihandler, stack2, true);
+
+                        if (stack1 == ItemStack.EMPTY || stack1.getCount() == 0) {
+                            ItemHandlerHelper.insertItem(ihandler, handler.extractItem(0, AMP, false), false);
+                            markDirty();
+                        }
                     }
-                //}
+                }
             }
         }
     }

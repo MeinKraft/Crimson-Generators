@@ -13,6 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.potion.Potions;
+import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
@@ -43,6 +44,13 @@ public class BlockWaterGen extends Block {
                 .harvestLevel(1)
                 .harvestTool(ToolType.PICKAXE)
                 .setRequiresTool());
+        this.setDefaultState(this.stateContainer.getBaseState().with(CrimsonGenerators.TIER, 0));
+    }
+
+    @Override
+    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+        super.fillStateContainer(builder);
+        builder.add(CrimsonGenerators.TIER);
     }
 
     @Override
@@ -51,6 +59,12 @@ public class BlockWaterGen extends Block {
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) { return new TileWaterGen(); }
+
+    @Override
+    public void onReplaced(BlockState oldState, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (oldState.getBlock() != newState.getBlock()) worldIn.removeTileEntity(pos);
+        super.onReplaced(oldState, worldIn, pos, newState, isMoving);
+    }
 
     @Override
     public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult) {
