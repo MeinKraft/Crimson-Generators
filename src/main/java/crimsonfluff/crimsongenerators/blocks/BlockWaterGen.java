@@ -20,6 +20,8 @@ import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
@@ -96,6 +98,8 @@ public class BlockWaterGen extends Block {
                         if (fluidHandler.drain(333, IFluidHandler.FluidAction.SIMULATE).getAmount() == 333) {
                             fluidHandler.drain(333, IFluidHandler.FluidAction.EXECUTE);
 
+                            player.world.playSound(null, player.getPosition(), SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.PLAYERS, 1f, 1f);
+
                             heldItem.shrink(1);
                             ItemStack itemPotion = PotionUtils.addPotionToItemStack(new ItemStack(Items.POTION), Potions.WATER);
 
@@ -110,6 +114,8 @@ public class BlockWaterGen extends Block {
                             if (fluidHandler.fill(new FluidStack(Fluids.WATER, 333), IFluidHandler.FluidAction.SIMULATE) == 333) {
                                 fluidHandler.fill(new FluidStack(Fluids.WATER, 333), IFluidHandler.FluidAction.EXECUTE);
 
+                                player.world.playSound(null, player.getPosition(), SoundEvents.ITEM_BOTTLE_EMPTY, SoundCategory.PLAYERS, 1f, 1f);
+
                                 heldItem.shrink(1);
                                 ItemStack itemBottle = new ItemStack(Items.GLASS_BOTTLE);
 
@@ -121,20 +127,10 @@ public class BlockWaterGen extends Block {
                             }
                         }
                     } else {
-                        if (!FluidUtil.interactWithFluidHandler(player, hand, fluidHandler)) {
-                            //LOGGER.info("Interact.FAILED");
-                            return ActionResultType.FAIL;
-                        } else {
-                            //LOGGER.info("Interact.SUCCESS");
-                            return ActionResultType.SUCCESS;
-                        }
+                        return (FluidUtil.interactWithFluidHandler(player, hand, fluidHandler)) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
                     }
                 }
-
-                //LOGGER.info("FAILED: " + heldItem.getItem().getTranslationKey());
             }
-
-            //LOGGER.info("FAILED: Ever here");
         }
 
         return ActionResultType.SUCCESS;
