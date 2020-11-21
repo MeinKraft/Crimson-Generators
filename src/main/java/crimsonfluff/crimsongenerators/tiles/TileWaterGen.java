@@ -1,5 +1,6 @@
 package crimsonfluff.crimsongenerators.tiles;
 
+import crimsonfluff.crimsongenerators.CrimsonGenerators;
 import crimsonfluff.crimsongenerators.init.tilesInit;
 import net.minecraft.block.BlockState;
 import net.minecraft.fluid.Fluids;
@@ -52,7 +53,22 @@ public class TileWaterGen extends TileEntity implements ITickableTileEntity {
         if (ticks == 20) {
             ticks = 0;
 
-            this.tank.fill(new FluidStack(Fluids.WATER.getFluid(), 100), IFluidHandler.FluidAction.EXECUTE);
+            int AMP=0;
+            switch(this.getBlockState().get(CrimsonGenerators.TIER)) {
+                case 0:
+                    AMP = 100;
+                    break;
+                case 1:
+                    AMP = 250;
+                    break;
+                case 2:
+                    AMP = 500;
+                    break;
+                case 3:
+                    AMP = 1000;
+            }
+
+            this.tank.fill(new FluidStack(Fluids.WATER.getFluid(), AMP), IFluidHandler.FluidAction.EXECUTE);
             this.markDirty();
         }
     }

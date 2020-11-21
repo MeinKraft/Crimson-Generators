@@ -10,6 +10,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.potion.PotionUtils;
@@ -69,54 +70,7 @@ public class BlockLavaGen extends Block {
         super.onReplaced(oldState, worldIn, pos, newState, isMoving);
     }
 
-    @Override
-    public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult) {
-        ItemStack heldItem = player.getHeldItem(hand);
-        TileEntity tileEntity = world.getTileEntity(pos);
-
-        if (tileEntity != null) {
-            LazyOptional<IFluidHandler> fluidHandlerCap = tileEntity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
-            if (!fluidHandlerCap.isPresent()) {
-                //spawnParticles(world, pos, state);
-            }
-            else
-            {
-                IFluidHandler fluidHandler = fluidHandlerCap.orElseThrow(IllegalStateException::new);
-
-                if (!FluidUtil.interactWithFluidHandler(player, hand, fluidHandler)) {
-                    // Special case for bottles, they can hold 1/3 of a bucket
-
-                    if (heldItem.getItem() == Items.BUCKET) {
-                        FluidStack simulated = fluidHandler.drain(1000, IFluidHandler.FluidAction.SIMULATE);
-
-                        if (simulated.getAmount() == 1000) {
-                            fluidHandler.drain(1000, IFluidHandler.FluidAction.EXECUTE);
-
-                            if (player.addItemStackToInventory(new ItemStack(Items.LAVA_BUCKET))) {
-                                heldItem.shrink(1);
-                            }
-                        }
-                    } else {
-                        if (heldItem.getItem() == Items.GLASS_BOTTLE) {
-                            FluidStack simulated = fluidHandler.drain(333, IFluidHandler.FluidAction.SIMULATE);
-
-                            if (simulated.getAmount() == 333) {
-                                fluidHandler.drain(333, IFluidHandler.FluidAction.EXECUTE);
-
-                                if (player.addItemStackToInventory(new ItemStack(itemsInit.LAVA_BOTTLE.get()))) {
-                                    heldItem.shrink(1);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return ActionResultType.SUCCESS;
-    }
-
-    @Override
+   @Override
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, @Nullable IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         tooltip.add((new TranslationTextComponent("tip."+ CrimsonGenerators.MOD_ID+".lava_gen_block").mergeStyle(TextFormatting.GREEN)));
@@ -125,5 +79,63 @@ public class BlockLavaGen extends Block {
             tooltip.add((new TranslationTextComponent("No Upgrades Installed").mergeStyle(TextFormatting.GREEN)));
         else
             tooltip.add((new TranslationTextComponent("tip."+ CrimsonGenerators.MOD_ID+".hold_shift")));
+    }
+
+    @Override
+    public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult) {
+        if (!world.isRemote) {
+            ItemStack heldItem = player.getHeldItem(hand);
+            TileEntity tileEntity = world.getTileEntity(pos);
+
+            if (tileEntity != null) {
+                LazyOptional<IFluidHandler> fluidHandlerCap = tileEntity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+
+                if (fluidHandlerCap.isPresent()) {
+                    IFluidHandler fluidHandler = fluidHandlerCap.orElseThrow(IllegalStateException::new);
+
+                    if (heldItem.getItem() == Items.GLASS_BOTTLE) {
+                        if (fluidHandler.drain(333, IFluidHandler.FluidAction.SIMULATE).getAmount() == 333) {
+                            fluidHandler.drain(333, IFluidHandler.FluidAction.EXECUTE);
+
+                            heldItem.shrink(1);
+                            ItemStack itemPotion = new ItemStack(itemsInit.LAVA_BOTTLE.get());
+
+                            if (!player.addItemStackToInventory(itemPotion)) {
+                                spawnAsEntity(world, player.getPosition(), itemPotion);
+                            }
+
+                            return ActionResultType.SUCCESS;
+                        }
+                    } else if (heldItem.getItem() == itemsInit.LAVA_BOTTLE.get()) {
+                            if (fluidHandler.fill(new FluidStack(Fluids.LAVA, 333), IFluidHandler.FluidAction.SIMULATE) == 333) {
+                                fluidHandler.fill(new FluidStack(Fluids.LAVA, 333), IFluidHandler.FluidAction.EXECUTE);
+
+                                heldItem.shrink(1);
+                                ItemStack itemBottle = new ItemStack(Items.GLASS_BOTTLE);
+
+                                if (!player.addItemStackToInventory(itemBottle)) {
+                                    spawnAsEntity(world, player.getPosition(), itemBottle);
+                                }
+
+                                return ActionResultType.SUCCESS;
+                            }
+                    } else {
+                        if (!FluidUtil.interactWithFluidHandler(player, hand, fluidHandler)) {
+                            //LOGGER.info("Interact.FAILED");
+                            return ActionResultType.FAIL;
+                        } else {
+                            //LOGGER.info("Interact.SUCCESS");
+                            return ActionResultType.SUCCESS;
+                        }
+                    }
+                }
+
+                //LOGGER.info("FAILED: " + heldItem.getItem().getTranslationKey());
+            }
+
+            //LOGGER.info("FAILED: Ever here");
+        }
+
+        return ActionResultType.SUCCESS;
     }
 }
