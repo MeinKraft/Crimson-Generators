@@ -54,38 +54,4 @@ public class CrimsonGenerators {
         @Override
         public ItemStack createIcon() { return new ItemStack(blocksInit.COAL_GEN_BLOCK.get()); }
     };
-
-    @SubscribeEvent
-    public void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
-        PlayerEntity entity = event.getPlayer();
-        World world = event.getWorld();
-        BlockState state = world.getBlockState(event.getPos());
-        Block block = state.getBlock();
-
-        boolean success=false;
-
-        if (!world.isRemote) {
-            if (block.getBlock() == blocksInit.COAL_GEN_BLOCK.get() ||
-                    block.getBlock() == blocksInit.LAVA_GEN_BLOCK.get() ||
-                    block.getBlock() == blocksInit.WATER_GEN_BLOCK.get()) {
-
-                if (entity.inventory.getCurrentItem().getItem() == itemsInit.UPGRADE_TIER1.get()) {
-                    if (state.get(TIER)==0) success = true;
-                }
-
-                if (entity.inventory.getCurrentItem().getItem() == itemsInit.UPGRADE_TIER2.get()) {
-                    if (state.get(TIER)==1) success = true;
-                }
-
-                if (entity.inventory.getCurrentItem().getItem() == itemsInit.UPGRADE_TIER3.get()) {
-                    if (state.get(TIER)==2) success = true;
-                }
-
-                if (success) {
-                    world.playSound(null, event.getPos(), SoundEvents.BLOCK_ANVIL_USE, SoundCategory.PLAYERS, 1f, 1f);
-                    world.setBlockState(event.getPos(), state.with(TIER, state.get(TIER) + 1));
-                }
-            }
-        }
-    }
 }

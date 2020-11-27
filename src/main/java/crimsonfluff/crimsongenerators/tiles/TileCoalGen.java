@@ -98,8 +98,7 @@ public class TileCoalGen extends TileEntity implements ITickableTileEntity {
 
     @Override
     public CompoundNBT write(CompoundNBT tag) {
-        CompoundNBT compound = getItemHandler().serializeNBT();
-        tag.put("inv", compound);
+        tag.put("inv", getItemHandler().serializeNBT());
         if (this.customName!=null) {
             tag.putString("CustomName", ITextComponent.Serializer.toJson(this.customName));
         }
