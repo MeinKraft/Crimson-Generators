@@ -1,8 +1,0 @@
-{
-  "variants": {
-    "tier=0": {"model": "crimsongenerators:block/lava_gen_block"},
-    "tier=1": {"model": "crimsongenerators:block/lava_gen_block_tier1"},
-    "tier=2": {"model": "crimsongenerators:block/lava_gen_block_tier2"},
-    "tier=3": {"model": "crimsongenerators:block/lava_gen_block_tier3"}
-  }
-}

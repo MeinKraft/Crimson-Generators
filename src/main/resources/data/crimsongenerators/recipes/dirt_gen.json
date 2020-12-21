@@ -1,0 +1,23 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "###",
+        "#B#",
+        "SSS"
+    ],
+    "key": {
+        "#": {
+            "item": "minecraft:dirt"
+        },
+        "B": {
+            "item": "minecraft:blast_furnace"
+        },
+        "S": {
+            "item": "minecraft:smooth_stone"
+        }
+    },
+    "result": {
+        "item": "crimsongenerators:dirt_gen",
+        "count": 1
+    }
+}

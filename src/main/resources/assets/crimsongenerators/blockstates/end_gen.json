@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "facing=north,lit=false,soul=false": { "model": "crimsongenerators:block/end_gen" },
+    "facing=south,lit=false,soul=false": { "model": "crimsongenerators:block/end_gen", "y": 180 },
+    "facing=west,lit=false,soul=false": { "model": "crimsongenerators:block/end_gen", "y": 270 },
+    "facing=east,lit=false,soul=false": { "model": "crimsongenerators:block/end_gen", "y": 90 },
+    "facing=north,lit=true,soul=false": { "model": "crimsongenerators:block/end_gen_lit" },
+    "facing=south,lit=true,soul=false": { "model": "crimsongenerators:block/end_gen_lit", "y": 180 },
+    "facing=west,lit=true,soul=false": { "model": "crimsongenerators:block/end_gen_lit", "y": 270 },
+    "facing=east,lit=true,soul=false": { "model": "crimsongenerators:block/end_gen_lit", "y": 90 },
+	
+	"facing=north,lit=false,soul=true": { "model": "crimsongenerators:block/end_gen" },
+    "facing=south,lit=false,soul=true": { "model": "crimsongenerators:block/end_gen", "y": 180 },
+    "facing=west,lit=false,soul=true": { "model": "crimsongenerators:block/end_gen", "y": 270 },
+    "facing=east,lit=false,soul=true": { "model": "crimsongenerators:block/end_gen", "y": 90 },
+    "facing=north,lit=true,soul=true": { "model": "crimsongenerators:block/end_gen_lit_soul" },
+    "facing=south,lit=true,soul=true": { "model": "crimsongenerators:block/end_gen_lit_soul", "y": 180 },
+    "facing=west,lit=true,soul=true": { "model": "crimsongenerators:block/end_gen_lit_soul", "y": 270 },
+    "facing=east,lit=true,soul=true": { "model": "crimsongenerators:block/end_gen_lit_soul", "y": 90 }
+  }
+}

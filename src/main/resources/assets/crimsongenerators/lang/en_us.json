@@ -2,16 +2,19 @@
   "itemGroup.crimsongenerators":  "Crimson Generators",
   "tip.crimsongenerators.hold_shift": "\u00A77Hold\u00A7e Shift\u00A77 for more information!",
 
-  "block.crimsongenerators.coal_gen_block": "Coal Ore Generator",
-  "block.crimsongenerators.lava_gen_block": "Lava Generator",
-  "block.crimsongenerators.water_gen_block": "Water Generator",
+  "block.crimsongenerators.cobble_gen": "Cobble Generator",
+  "block.crimsongenerators.sand_gen": "Sand Generator",
+  "block.crimsongenerators.clay_gen": "Clay Generator",
+  "block.crimsongenerators.dirt_gen": "Dirt Generator",
+  "block.crimsongenerators.nether_gen": "Netherrack Generator",
+  "block.crimsongenerators.end_gen": "End Stone Generator",
+  "block.crimsongenerators.obsidian_gen": "Obsidian Generator",
 
-  "tip.crimsongenerators.coal_gen_block": "Passively does things",
-  "tip.crimsongenerators.lava_gen_block": "Passively does things",
-  "tip.crimsongenerators.water_gen_block": "Passively does things",
-
-  "item.crimsongenerators.upgrade_tier1": "Tier 1 Generator Upgrade",
-  "item.crimsongenerators.upgrade_tier2": "Tier 2 Generator Upgrade",
-  "item.crimsongenerators.upgrade_tier3": "Tier 3 Generator Upgrade",
-  "item.crimsongenerators.lava_bottle": "Lava in a bottle"
+  "container.crimsongenerators.cobblestone": "Cobble Maker 1000",
+  "container.crimsongenerators.sand": "Sand Maker 1000",
+  "container.crimsongenerators.clay": "Clay Maker 1000",
+  "container.crimsongenerators.dirt": "Dirt Maker 1000",
+  "container.crimsongenerators.nether": "Netherrack Maker 1000",
+  "container.crimsongenerators.end": "End Stone Maker 1000",
+  "container.crimsongenerators.obsidian": "Obsidian Maker 1000"
 }

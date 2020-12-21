@@ -1,0 +1,23 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "###",
+        "#B#",
+        "SSS"
+    ],
+    "key": {
+        "#": {
+            "item": "minecraft:sand"
+        },
+        "B": {
+            "item": "minecraft:blast_furnace"
+        },
+        "S": {
+            "item": "minecraft:smooth_stone"
+        }
+    },
+    "result": {
+        "item": "crimsongenerators:sand_gen",
+        "count": 1
+    }
+}

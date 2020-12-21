@@ -125,10 +125,10 @@ dependencies {
 jar {
     manifest {
         attributes([
-            "Specification-Title": "crimsongenerators",
+            "Specification-Title": "CrimsonGenerators",
             "Specification-Vendor": "CrimsonFluff",
             "Specification-Version": "${project.crimsongenerators_version}", // We are version 1 of ourselves
-            "Implementation-Title": "crimsongenerators",
+            "Implementation-Title": "CrimsonGenerators",
             "Implementation-Version": "${project.crimsongenerators_version}",
             "Implementation-Vendor" :"CrimsonFluff",
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")

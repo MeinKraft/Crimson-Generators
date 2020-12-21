@@ -1,6 +1,0 @@
-{
-  "parent": "block/cube_all",
-  "textures": {
-    "all": "crimsongenerators:block/coal_gen_block_tier1"
-  }
-}

@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "facing=north,lit=false": { "model": "crimsongenerators:block/cobble_gen" },
+    "facing=south,lit=false": { "model": "crimsongenerators:block/cobble_gen", "y": 180 },
+    "facing=west,lit=false": { "model": "crimsongenerators:block/cobble_gen", "y": 270 },
+    "facing=east,lit=false": { "model": "crimsongenerators:block/cobble_gen", "y": 90 },
+    "facing=north,lit=true": { "model": "crimsongenerators:block/cobble_gen_lit" },
+    "facing=south,lit=true": { "model": "crimsongenerators:block/cobble_gen_lit", "y": 180 },
+    "facing=west,lit=true": { "model": "crimsongenerators:block/cobble_gen_lit", "y": 270 },
+    "facing=east,lit=true": { "model": "crimsongenerators:block/cobble_gen_lit", "y": 90 }
+  }
+}
