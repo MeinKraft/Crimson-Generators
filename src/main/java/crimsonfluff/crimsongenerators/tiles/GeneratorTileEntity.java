@@ -1,7 +1,7 @@
 package crimsonfluff.crimsongenerators.tiles;
 
 import crimsonfluff.crimsongenerators.CrimsonGenerators;
-import crimsonfluff.crimsongenerators.blocks.BlockGenCobble;
+import crimsonfluff.crimsongenerators.blocks.BlockGenBase;
 import crimsonfluff.crimsongenerators.containers.GeneratorContainer;
 import crimsonfluff.crimsongenerators.init.tilesInit;
 import net.minecraft.block.Block;
@@ -14,15 +14,16 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.*;
+import net.minecraft.tileentity.ITickableTileEntity;
+import net.minecraft.tileentity.LockableLootTileEntity;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.IIntArray;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
 
 public class GeneratorTileEntity extends LockableLootTileEntity implements ITickableTileEntity {
     private NonNullList<ItemStack> chestContents;
@@ -169,26 +170,6 @@ public class GeneratorTileEntity extends LockableLootTileEntity implements ITick
         return compound;
     }
 
-    public static int getNumberOfPlayersUsing(World worldIn, LockableTileEntity lockableTileEntity, int ticksSinceSync, int x, int y, int z, int numPlayersUsing) {
-        if (!worldIn.isRemote && numPlayersUsing != 0 && (ticksSinceSync + x + y + z) % 200 == 0) {
-            numPlayersUsing = getNumberOfPlayersUsing(worldIn, lockableTileEntity, x, y, z);
-        }
-
-        return numPlayersUsing;
-    }
-
-    public static int getNumberOfPlayersUsing(World world, LockableTileEntity lockableTileEntity, int x, int y, int z) {
-        int i = 0;
-
-        for (PlayerEntity playerentity : world.getEntitiesWithinAABB(PlayerEntity.class, new AxisAlignedBB((double) ((float) x - 5.0F), (double) ((float) y - 5.0F), (double) ((float) z - 5.0F), (double) ((float) (x + 1) + 5.0F), (double) ((float) (y + 1) + 5.0F), (double) ((float) (z + 1) + 5.0F)))) {
-            if (playerentity.openContainer instanceof GeneratorContainer) {
-                ++i;
-            }
-        }
-
-        return i;
-    }
-
     @Override
     public boolean receiveClientEvent(int id, int type) {
         if (id == 1) {
@@ -221,7 +202,7 @@ public class GeneratorTileEntity extends LockableLootTileEntity implements ITick
     protected void onOpenOrClose() {
         Block block = this.getBlockState().getBlock();
 
-        if (block instanceof BlockGenCobble) {
+        if (block instanceof BlockGenBase) {
             this.world.addBlockEvent(this.pos, block, 1, this.numPlayersUsing);
             this.world.notifyNeighborsOfStateChange(this.pos, block);
         }
@@ -234,23 +215,13 @@ public class GeneratorTileEntity extends LockableLootTileEntity implements ITick
 
     @Override
     public void setItems(NonNullList<ItemStack> itemsIn) {
-        this.chestContents = NonNullList.<ItemStack>withSize(2, ItemStack.EMPTY);
+        this.chestContents = NonNullList.withSize(2, ItemStack.EMPTY);
 
         for (int i = 0; i < itemsIn.size(); i++) {
             if (i < this.chestContents.size()) {
                 this.getItems().set(i, itemsIn.get(i));
             }
         }
-    }
-
-    public static int getPlayersUsing(IBlockReader reader, BlockPos posIn) {
-        BlockState blockstate = reader.getBlockState(posIn);
-        if (blockstate.hasTileEntity()) {
-            TileEntity tileentity = reader.getTileEntity(posIn);
-            if (tileentity instanceof GeneratorTileEntity) return ((GeneratorTileEntity) tileentity).numPlayersUsing;
-        }
-
-        return 0;
     }
 
     @Override
@@ -266,29 +237,32 @@ public class GeneratorTileEntity extends LockableLootTileEntity implements ITick
         if (ticks == 20) {
             ticks = 0;
 
-//            BlockState state = this.getBlockState();
-//            BlockPos pos = this.pos;
-//            World world = this.getWorld();
-            //CrimsonChest.LOGGER.info("COBBLE: Block is ticking");
-
             if (isBurning == 0) {
-                if (!this.getStackInSlot(0).isEmpty() || (this.getStackInSlot(0).getCount() != 0)) {
+                // double check because could be empty bucket leftover from a fuel bucket ie: LAVA_BUCKET
+                // .getBurnTime checks for .isEmpty
+                if (net.minecraftforge.common.ForgeHooks.getBurnTime(this.getStackInSlot(0)) > 0) {
                     isBurning = 1;
                     itemsToOutput = net.minecraftforge.common.ForgeHooks.getBurnTime(this.getStackInSlot(0)) / 200;
 
-                    this.getStackInSlot(0).shrink(1);
+                    // TODO: How to accurately tell if its a 'bucket' style fuel
+                    // if it is then return empty bucket
+                    if (this.getStackInSlot(0).hasContainerItem())
+                        this.setInventorySlotContents(0, this.getStackInSlot(0).getContainerItem());
+                    else
+                        this.getStackInSlot(0).shrink(1);
+
                     this.world.setBlockState(this.pos, this.world.getBlockState(this.pos).with(CrimsonGenerators.GENERATOR_PROPERTY_LIT, true), 3);
                 }
             }
 
-            if (isBurning !=0 ) {
-                if ((itemsOutputted) == itemsToOutput) {
-                    if (this.getStackInSlot(0).isEmpty() || (this.getStackInSlot(0).getCount() == 0)) {        // out of fuel so reset everything
+            if (isBurning != 0) {
+                if (itemsOutputted == itemsToOutput) {
+                    if (net.minecraftforge.common.ForgeHooks.getBurnTime(this.getStackInSlot(0)) == 0) {        // out of fuel so reset everything
                         isBurning = 0;
-                        this.world.setBlockState(this.pos, this.world.getBlockState(this.pos).with(CrimsonGenerators.GENERATOR_PROPERTY_LIT, false), 3);
-
                         itemsToOutput = 0;
                         itemsOutputted = 0;
+
+                        this.world.setBlockState(this.pos, this.world.getBlockState(this.pos).with(CrimsonGenerators.GENERATOR_PROPERTY_LIT, false), 3);
 
                         return;
 
@@ -316,26 +290,28 @@ public class GeneratorTileEntity extends LockableLootTileEntity implements ITick
     @Override
     public boolean isItemValidForSlot(int index, ItemStack stack) {
         // if index=0 then input slot, only allow fuels
-        if (index == 0) {
-            return net.minecraftforge.common.ForgeHooks.getBurnTime(stack) > 0;
-            //return AbstractFurnaceTileEntity.isFuel(stack);
-        }
+        if (index == 0) return net.minecraftforge.common.ForgeHooks.getBurnTime(stack) > 0;
 
         // if index=1 then Output slot, return false to NOT allow anything to be inserted
         return false;
     }
 
-    // Don't alloy extraction from Slot(0) - Fuel Input
+    // Don't allow extraction from Slot(0) - Fuel Input
     // prevents Hoppers pulling fuel out - NOTE: May cause problems with Mods wanting to pull fuel out
-    @Override
-    public ItemStack decrStackSize(int index, int count) {
-        if (index==0) return ItemStack.EMPTY;
 
-        this.fillWithLoot((PlayerEntity)null);
+    /*    @Override
+    public ItemStack decrStackSize(int index, int count) {
+        if (index == 0) return ItemStack.EMPTY;
+
+        this.fillWithLoot(null);
+>>>>>>> Stashed changes
         ItemStack itemstack = ItemStackHelper.getAndSplit(this.getItems(), index, count);
         if (!itemstack.isEmpty()) this.markDirty();
 
         return itemstack;
+<<<<<<< Updated upstream
     }
+=======
+    }*/
 }
 

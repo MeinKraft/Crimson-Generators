@@ -2,32 +2,32 @@ package crimsonfluff.crimsongenerators;
 
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 public class SlotGeneratorOutput extends Slot {
-    private static Item itemOutput;// = Items.AIR;
+    //private static Item itemOutput;// = Items.AIR;
 
-    public SlotGeneratorOutput(IInventory inventoryIn, int index, int xPosition, int yPosition, Item item) {
+    public SlotGeneratorOutput(IInventory inventoryIn, int index, int xPosition, int yPosition) {
         super(inventoryIn, index, xPosition, yPosition);
 
-        itemOutput = item;
+        //itemOutput = item;
     }
 
-    @Override
+//    public int getSlotStackLimit() {
+//        return 79;
+//    }
+//
+//    public int getItemStackLimit(ItemStack stack) {
+//        return 64;
+//    }
+
+
+    // NOTE: If slot is empty then this is called
     public boolean isItemValid(ItemStack stack) {
-//        CrimsonChest.LOGGER.info("ItemValidate OUTPUT");
-//        return false;
+        //CrimsonGenerators.LOGGER.info("SLOT ISITEMVALID: ");
 
-        return (stack.getItem() == itemOutput);
+        return false;
+
+//        return (stack.getItem() == itemOutput);
     }
-
-/*    public int getItemStackLimit(ItemStack stack) {
-        return 119;
-    }
-
-    // Shift Click into OutputSlot obeys this, UPTO 64 !
-    public int getSlotStackLimit() {
-        return Integer.MAX_VALUE;
-    }*/
 }

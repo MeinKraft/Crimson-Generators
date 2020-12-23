@@ -52,11 +52,17 @@ public class GeneratorChestScreen extends ContainerScreen<GeneratorContainer> im
             int outPutted = this.container.itemsOutputted();
             int toOutput = this.container.itemsToOutput();
 
-            float f = 24 * ((float) outPutted / toOutput);
-            if (f == 0) f = 1;
+            //CrimsonGenerators.LOGGER.info("OUTPUT: " + toOutput);
+            //blit(matrixStack, x + 79, y + 35, 176, 14, (int) f, 17, 256, 256);
 
-            blit(matrixStack, x + 79, y + 35, 176, 14, (int) f, 17, 256, 256);
-            //CrimsonChest.LOGGER.info("COBBLE: partialTicks " + partialTicks);
+            // NOTE: Should never be 0, but just in case
+            if (toOutput != 0) {
+                int f = outPutted * 14 / toOutput;
+
+                //if (this.container.isSoul) blit(matrixStack, x + 57, y + 54 + f, 190, f, 14, 14 - f, 256, 256);
+                //else
+                blit(matrixStack, x + 57, y + 54 + f, 176, f, 14, 14 - f, 256, 256);
+            }
         }
     }
 }

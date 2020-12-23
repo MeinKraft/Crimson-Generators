@@ -11,7 +11,7 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.tileentity.AbstractFurnaceTileEntity;
 import net.minecraft.util.IIntArray;
 import net.minecraft.util.IntArray;
 import net.minecraftforge.api.distmarker.Dist;
@@ -42,7 +42,8 @@ public class GeneratorContainer extends Container {
 
         // GeneratorBlock Inventory
         this.addSlot(new SlotFuelInput(inventory, 0, 56, 35));
-        this.addSlot(new SlotGeneratorOutput(inventory, 1, 117, 35, Items.COBBLESTONE));
+        this.addSlot(new SlotGeneratorOutput(inventory, 1, 117, 35));
+
 
         // Player Inventory
         for (int chestRow = 0; chestRow < 3; chestRow++) {
@@ -69,6 +70,8 @@ public class GeneratorContainer extends Container {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.inventorySlots.get(index);
 
+        //CrimsonGenerators.LOGGER.info("SLOT CHANGE: " + index + " SLOT: " + slot);
+
         if (slot != null && slot.getHasStack()) {
             ItemStack itemstack1 = slot.getStack();
             itemstack = itemstack1.copy();
@@ -82,11 +85,32 @@ public class GeneratorContainer extends Container {
                 return ItemStack.EMPTY;
             }
 
-            if (itemstack1.isEmpty()) {
-                slot.putStack(ItemStack.EMPTY);
-            }
-            else {
-                slot.onSlotChanged();
+            // Shift clicking FROM GeneratorInventory TO PlayerInventory
+            // if Click FuelSlot (0) or Click OutputSlot (1) then Merge with PlayerInventory
+            if (index <= 1) {
+                if (!this.mergeItemStack(itemstack1, 2, this.inventorySlots.size(), true)) {
+                    return ItemStack.EMPTY;
+                }
+            } else {
+                // if its FROM PlayerInventory
+                // if its a fuel then try to merge with FuelSlot (0)
+                if (AbstractFurnaceTileEntity.isFuel(itemstack1)) {
+                    if (!this.mergeItemStack(itemstack1, 0, 1, false)) {
+                        return ItemStack.EMPTY;
+                    }
+                }
+
+                // if FROM PlayerInventory then merge with HOTBAR
+                if (index >= 2 && index < 30) {
+                    if (!this.mergeItemStack(itemstack1, 30, 38, false)) {
+                        return ItemStack.EMPTY;
+                    }
+                }
+
+                // if FROM HOTBAR then merge with PlayerInventory
+                if (index >= 30 && index < 38 && !this.mergeItemStack(itemstack1, 2, 30, false)) {
+                    return ItemStack.EMPTY;
+                }
             }
         }
 
@@ -113,10 +137,5 @@ public class GeneratorContainer extends Container {
     @OnlyIn(Dist.CLIENT)
     public int itemsToOutput() {
         return this.array.get(2) ;
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public int getSize() {
-        return 3;
     }
 }

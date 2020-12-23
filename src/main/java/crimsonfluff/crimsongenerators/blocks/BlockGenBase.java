@@ -15,25 +15,20 @@ import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particles.ParticleTypes;
-import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.AbstractFurnaceTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.ToolType;
-import org.jline.terminal.Size;
 
 import javax.annotation.Nullable;
-import javax.swing.*;
 import java.util.Random;
 
 public class BlockGenBase extends Block {
@@ -66,15 +61,15 @@ public class BlockGenBase extends Block {
     @Override
     @Nullable
     public INamedContainerProvider getContainer(BlockState state, World world, BlockPos pos) {
-        TileEntity tileentity = world.getTileEntity(pos);
-        return tileentity instanceof INamedContainerProvider ? (INamedContainerProvider) tileentity : null;
+        TileEntity tile = world.getTileEntity(pos);
+        return tile instanceof INamedContainerProvider ? (INamedContainerProvider) tile : null;
     }
 
     @Override
     public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
         super.eventReceived(state, worldIn, pos, id, param);
-        TileEntity tileentity = worldIn.getTileEntity(pos);
-        return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
+        TileEntity tile = worldIn.getTileEntity(pos);
+        return tile == null ? false : tile.receiveClientEvent(id, param);
     }
 
     @Override
@@ -123,13 +118,17 @@ public class BlockGenBase extends Block {
             // SoulFire excl to Soul Sand Valley and naturally on Soul Soil
             //if (worldIn.getBiome(pos).getRegistryName().toString() == "soul_sand_valley")
             //if (worldIn.getDimensionKey() == World.THE_NETHER)
-            if (worldIn.getBlockState(pos.offset(Direction.DOWN)).getBlock() == Blocks.SOUL_SOIL)
-                worldIn.addParticle(ParticleTypes.SOUL_FIRE_FLAME, d0 + d5, d1 + d6, d2 + d7, 0.0D, 0.0D, 0.0D);
-            else
-                worldIn.addParticle(ParticleTypes.FLAME, d0 + d5, d1 + d6, d2 + d7, 0.0D, 0.0D, 0.0D);
+
+            worldIn.addParticle(stateIn.get(CrimsonGenerators.GENERATOR_PROPERTY_SOUL) ? ParticleTypes.SOUL_FIRE_FLAME : ParticleTypes.FLAME , d0 + d5, d1 + d6, d2 + d7, 0.0D, 0.0D, 0.0D);
+
+//            if (worldIn.getBlockState(pos.offset(Direction.DOWN)).getBlock() == Blocks.SOUL_SOIL)
+//                worldIn.addParticle(ParticleTypes.SOUL_FIRE_FLAME, d0 + d5, d1 + d6, d2 + d7, 0.0D, 0.0D, 0.0D);
+//            else
+//                worldIn.addParticle(ParticleTypes.FLAME, d0 + d5, d1 + d6, d2 + d7, 0.0D, 0.0D, 0.0D);
         }
     }
 
+    // Called when block is destroyed
     @Override
     public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
         GeneratorTileEntity tile = (GeneratorTileEntity) worldIn.getTileEntity(pos);
@@ -144,13 +143,24 @@ public class BlockGenBase extends Block {
         }
     }
 
+    public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
+        // BlockIn is NOT the new block that's been placed, its the block that HAS been REPLACED
+        if (!worldIn.isRemote()) {
+            // Check if its the block below the Generator that has changed
+            if (pos.offset(Direction.DOWN).equals(fromPos)) {
+                worldIn.setBlockState(pos, state.with(CrimsonGenerators.GENERATOR_PROPERTY_SOUL, worldIn.getBlockState(fromPos).getBlock() == Blocks.SOUL_SOIL), 3);
+            }
+        }
+    }
+
+    // Called after block has been placed, Post-Logic
     public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
         if (stack.hasDisplayName()) {
-            TileEntity tile = worldIn.getTileEntity(pos);
-            if (tile instanceof GeneratorTileEntity) ((GeneratorTileEntity) tile).setCustomName(stack.getDisplayName());
+            GeneratorTileEntity tile = (GeneratorTileEntity) worldIn.getTileEntity(pos);
+            if (tile != null) tile.setCustomName(stack.getDisplayName());
         }
 
-        if (worldIn.getBlockState(pos.offset(Direction.DOWN)).getBlock()==Blocks.SOUL_SOIL) {
+        if (worldIn.getBlockState(pos.offset(Direction.DOWN)).getBlock() == Blocks.SOUL_SOIL) {
             worldIn.setBlockState(pos, state.with(CrimsonGenerators.GENERATOR_PROPERTY_SOUL, true), 3);
         }
     }
@@ -162,9 +172,7 @@ public class BlockGenBase extends Block {
             if (tile == null) return;
             if (tile.getStackInSlot(1).getCount() == 0) return;
 
-            int SizeToTake;
-            if (KeyboardHelper.isHoldingShift()) SizeToTake = Integer.min(64, tile.getStackInSlot(1).getCount());
-            else SizeToTake = 1;
+            int SizeToTake = KeyboardHelper.isHoldingShift() ? Integer.min(64, tile.getStackInSlot(1).getCount()) : 1;
 
             ItemStack stack = new ItemStack (tile.getStackInSlot(1).getItem());
             stack.setCount(SizeToTake);
