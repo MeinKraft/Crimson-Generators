@@ -19,7 +19,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class GeneratorContainer extends Container {
     public GeneratorContainer (int windowId, PlayerInventory playerInventory) {
-       this(containersInit.GENERATOR.get(), windowId, playerInventory, new Inventory(2), new IntArray(3));
+       this(containersInit.GENERATOR.get(), windowId, playerInventory, new Inventory(2), new IntArray(4));
     }
 
     public GeneratorContainer (int windowId, PlayerInventory playerInventory, IInventory inventory, IIntArray p_i50104_6_) {
@@ -33,7 +33,7 @@ public class GeneratorContainer extends Container {
         super(containerTypeIn, windowId);
         assertInventorySize(inventory, 2);
 
-        assertIntArraySize(array, 3);
+        assertIntArraySize(array, 4);
         this.array = array;
 
         this.inventory = inventory;
@@ -138,4 +138,7 @@ public class GeneratorContainer extends Container {
     public int itemsToOutput() {
         return this.array.get(2) ;
     }
+
+    @OnlyIn(Dist.CLIENT)
+    public int isSoulFire() { return this.array.get(3) ; }
 }

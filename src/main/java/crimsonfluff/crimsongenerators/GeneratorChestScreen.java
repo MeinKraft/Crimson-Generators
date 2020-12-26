@@ -1,7 +1,6 @@
 package crimsonfluff.crimsongenerators;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
 import crimsonfluff.crimsongenerators.containers.GeneratorContainer;
 import net.minecraft.client.gui.IHasContainer;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
@@ -14,8 +13,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class GeneratorChestScreen extends ContainerScreen<GeneratorContainer> implements IHasContainer<GeneratorContainer> {
-    private boolean isDone = false;     // PartialTicks keeps changing, indicating GUI is constantly drawn ?!
-
     public GeneratorChestScreen(GeneratorContainer container, PlayerInventory playerInventory, ITextComponent title) {
         super(container, playerInventory, title);
 
@@ -42,11 +39,8 @@ public class GeneratorChestScreen extends ContainerScreen<GeneratorContainer> im
         int x = (this.width - this.xSize) / 2;
         int y = (this.height - this.ySize) / 2;
 
-        if (!isDone) {
-            RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-
-            blit(matrixStack, x, y, 0, 0, 176, 166, 256, 256);
-        }
+        //RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        blit(matrixStack, x, y, 0, 0, 176, 166, 256, 256);
 
         if (this.container.isBurning()) {
             int outPutted = this.container.itemsOutputted();
@@ -59,9 +53,7 @@ public class GeneratorChestScreen extends ContainerScreen<GeneratorContainer> im
             if (toOutput != 0) {
                 int f = outPutted * 14 / toOutput;
 
-                //if (this.container.isSoul) blit(matrixStack, x + 57, y + 54 + f, 190, f, 14, 14 - f, 256, 256);
-                //else
-                blit(matrixStack, x + 57, y + 54 + f, 176, f, 14, 14 - f, 256, 256);
+                blit(matrixStack, x + 57, y + 54 + f, this.container.isSoulFire() == 0 ? 176 : 190, f, 14, 14 - f, 256, 256);
             }
         }
     }

@@ -11,6 +11,8 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
@@ -22,6 +24,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -97,6 +100,20 @@ public class BlockGenBase extends Block {
     public boolean hasComparatorInputOverride(BlockState state) { return true; }
 
     @Override
+    public int getComparatorInputOverride(BlockState blockState, World worldIn, BlockPos pos) {
+        return Container.calcRedstoneFromInventory((IInventory) worldIn.getTileEntity(pos));
+    }
+
+    @Override
+    public int getLightValue(BlockState state, IBlockReader world, BlockPos pos) {
+        // SoulCampfire is 10, Campfire is 15
+        if (state.get(CrimsonGenerators.GENERATOR_PROPERTY_LIT))
+            return state.get(CrimsonGenerators.GENERATOR_PROPERTY_SOUL) ? 9 : 14;
+
+        return 0;
+    }
+
+    @Override
     @OnlyIn(Dist.CLIENT)
     public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
         if (stateIn.get(CrimsonGenerators.GENERATOR_PROPERTY_LIT)) {
@@ -120,11 +137,6 @@ public class BlockGenBase extends Block {
             //if (worldIn.getDimensionKey() == World.THE_NETHER)
 
             worldIn.addParticle(stateIn.get(CrimsonGenerators.GENERATOR_PROPERTY_SOUL) ? ParticleTypes.SOUL_FIRE_FLAME : ParticleTypes.FLAME , d0 + d5, d1 + d6, d2 + d7, 0.0D, 0.0D, 0.0D);
-
-//            if (worldIn.getBlockState(pos.offset(Direction.DOWN)).getBlock() == Blocks.SOUL_SOIL)
-//                worldIn.addParticle(ParticleTypes.SOUL_FIRE_FLAME, d0 + d5, d1 + d6, d2 + d7, 0.0D, 0.0D, 0.0D);
-//            else
-//                worldIn.addParticle(ParticleTypes.FLAME, d0 + d5, d1 + d6, d2 + d7, 0.0D, 0.0D, 0.0D);
         }
     }
 

@@ -16,14 +16,11 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.LockableLootTileEntity;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.IIntArray;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
 
 public class GeneratorTileEntity extends LockableLootTileEntity implements ITickableTileEntity {
     private NonNullList<ItemStack> chestContents;
@@ -47,6 +44,8 @@ public class GeneratorTileEntity extends LockableLootTileEntity implements ITick
                     return GeneratorTileEntity.this.itemsOutputted;
                 case 2:
                     return GeneratorTileEntity.this.itemsToOutput;
+                case 3:
+                    return world.getBlockState(GeneratorTileEntity.this.getPos()).get(CrimsonGenerators.GENERATOR_PROPERTY_SOUL) ? 1 : 0;
                 default:
                     return 0;
             }
@@ -64,12 +63,14 @@ public class GeneratorTileEntity extends LockableLootTileEntity implements ITick
                 case 2:
                     GeneratorTileEntity.this.itemsToOutput = value;
                     break;
+                case 3:
+                    break;
             }
         }
 
         @Override
         public int size() {
-            return 3;
+            return 4;
         }
     };
 
@@ -236,6 +237,8 @@ public class GeneratorTileEntity extends LockableLootTileEntity implements ITick
         ticks++;
         if (ticks == 20) {
             ticks = 0;
+
+            //if (genBlock != null) CrimsonGenerators.LOGGER.info(genBlock.getTranslatedName());
 
             if (isBurning == 0) {
                 // double check because could be empty bucket leftover from a fuel bucket ie: LAVA_BUCKET
